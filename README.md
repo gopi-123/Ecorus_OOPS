@@ -9,6 +9,7 @@ The first assignment is a small assignment to create some basic Objects and show
 1- Create a class "Person" in Python, that has 2 attributes (name and age). Also has 2 methods, (apart from the constructors):
   - happyBirthday, that adds one year to the age
   - changeName, changes the name with the new name provided
+  
 2 - Create the class "Office", 2 attributes (name and peopleWorking), 2 methods and a constructor:
   - contructor, based on the name, and initialize the peopleWorking as empty
   - startWorkingFor, receiving one object of the class "Person" and add it to the peopleWorking
@@ -44,3 +45,9 @@ Questions:
 - How would you automate the testing?
 - How would you implement a continuous development system (pipelines) for this particular case?
 
+
+#### ToDo
+
+Assumed name and age are attributes of class
+
+It was difficult to understand whether name and age  are Class attributes or Instance Attributes

@@ -14,9 +14,13 @@ The first assignment is a small assignment to create some basic Objects and show
   - contructor, based on the name, and initialize the peopleWorking as empty
   - startWorkingFor, receiving one object of the class "Person" and add it to the peopleWorking
   - finishedWorkingFor, receiving "Person", remove it from peopleWorking
+
 3- Create an object of the class "Office", named Ecorus
+
 4- Create 2 objects of that class (Eduardo and <dev_name>)
+
 5- Make Eduardo and <dev_name> start working for Ecorus
+
 6- Make Eduardo finish working from Ecorus
 
 We would like to see the code developed for each exercise, and a console screenshot showing the result (printing the objects) after every exercise.
@@ -47,6 +51,11 @@ Questions:
 
 
 #### ToDo
+ Is that in Person class having 2 attributes (name and age) are instance attributes or class attributes?
+ 
+ Does name and age are default initialized in constructor? Then what are the default values for age, name..
+
+ What should be the value for age? any default value can be given?
 
 Assumed name and age are attributes of class
 

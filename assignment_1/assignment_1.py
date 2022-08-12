@@ -1,51 +1,65 @@
-
 class Person:
-    name = ""
-    age = " "
 
-    def __init__(self, name: str, age: int) -> None:
+    def __init__(self, name: str, age: int = 0) -> None:
         self.name = name
         self.age = age
-        pass
 
-    def happy_birthday(self):
+    def happy_birthday(self) -> None:
         # adds 1 year to the age
         self.age += 1
-        pass
 
-    def change_name(self, new_name: str):
-        # changes name with new name
+    def change_name(self, new_name: str) -> None:
+        # changes name with new name provided
         self.name = new_name
 
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Person):
+            return (other.name == self.name and other.age == self.age)
+        return False
 
-class Office():
-    __name: str
-    __people_Working: str
-
-    def __init__(self, name, people_working=""):
-        self.people_working = ""
-        pass
-
-    def start_working_for(self, Person_object):
-        pass
-
-    def finished_working_for(self, Person):
-        self.__people_Working = "remove Person from peopleworking"
-        pass
+    def __str__(self) -> str:
+        return f'Name:{self.name}, Age:{self.age}'
 
 
-obj_person = Person
+class Office:
+
+    def __init__(self, name: str, people_working: dict = dict()) -> None:
+        self.name = name
+        self.people_working = people_working
+
+    def start_working_for(self, person_object: object) -> None:
+        # self.people_working.append(Person_object)
+        self.people_working[person_object.name] = person_object.age
+
+    def finished_working_for(self, person_object: object) -> None:
+        if person_object.name in self.people_working:
+            del self.people_working[person_object.name]
+
+    def __str__(self) -> str:
+        return (
+            f'Name:{self.name}, '
+            f'People working:{self.people_working}'
+        )
+
+
+# 4: Create 2 objects of that class (Eduardo and <dev_name>)
+eduardo = Person("eduardo")
+ganga = Person("ganga", 15)
+
+# 3: Create an object of the class "Office", named Ecorus
 ecorus = Office("ecorus")
 
-eduardo = Office("ecorus")
-ganga = Office("ecorus")
 
-eduardo.start_working_for(obj_person)
-eduardo.finished_working_for(obj_person)
-
-print("obj_person:",obj_person)
-print("eduardo:", eduardo)
-print("ganga:", ganga)
+# 5: Make Eduardo and <dev_name> start working for Ecorus
+ecorus.start_working_for(eduardo)
+ecorus.start_working_for(ganga)
 
 
+# 6: Make Eduardo finish working from Ecorus
+ecorus.finished_working_for(eduardo)
 
+# console screenshot showing the result (printing the objects)
+print("Person Object-->", eduardo)
+print("Person Object-->", ganga)
+
+print("Office Object-->", ecorus)

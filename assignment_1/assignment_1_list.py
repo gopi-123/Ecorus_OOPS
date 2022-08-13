@@ -18,27 +18,26 @@ class Person:
         return False
 
     def __str__(self) -> str:
-        return f'Name:{self.name}, Age:{self.age}'
+        return f'Person(name:{self.name}, age:{self.age})'
 
 
 class Office:
 
-    def __init__(self, name: str, people_working: dict = dict()) -> None:
+    def __init__(self, name: str, people_working: list = []) -> None:
         self.name = name
         self.people_working = people_working
 
-    def start_working_for(self, person_object: object) -> None:
-        # self.people_working.append(Person_object)
-        self.people_working[person_object.name] = person_object.age
+    def start_working_for(self, person_object: Person) -> None:
+        self.people_working.append(person_object)
 
-    def finished_working_for(self, person_object: object) -> None:
-        if person_object.name in self.people_working:
-            del self.people_working[person_object.name]
+    def finished_working_for(self, person_object: Person) -> None:
+        if self.people_working and person_object in self.people_working:
+            del self.people_working[self.people_working.index(person_object)]
 
     def __str__(self) -> str:
         return (
-            f'Name:{self.name}, '
-            f'People working:{self.people_working}'
+            f'Office(name:{self.name}, '
+            f'people_working:{[str(person) for person in self.people_working]})'
         )
 
 

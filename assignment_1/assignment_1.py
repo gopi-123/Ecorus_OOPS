@@ -60,3 +60,6 @@ ecorus.finished_working_for(eduardo)
 print("Person Object-->", eduardo)
 print("Person Object-->", ganga)
 print("Office Object-->", ecorus)
+
+ecorus.start_working_for(eduardo)
+print("Office Object-->", ecorus)

@@ -3,28 +3,24 @@ import sqlite3
 
 from flask import Flask, Response, g, jsonify, render_template, request
 from flask_bootstrap import Bootstrap
+from flask_cors import CORS
 from flask_restful import Api, Resource
+from flask_assignment_1 import Person
 
 # creating the flask app
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # creating an API object
 api = Api(app)
 
-
 def connect_db():
-    sql = sqlite3.connect("./database.db")
-    sql.row_factory = sqlite3.Row
-    return sql
+    
+    print("1. Inside connect_db")
+    conn = sqlite3.connect('database.db')
+    return conn
 
-
-def get_db():
-    # Check if DB is there
-
-    if not hasattr(g, "sqlite3"):
-        g.sqlite3_db = connect_db()
-    return g.sqlite3_db
 
 
 # close the connection to the database automatically
@@ -33,6 +29,7 @@ def close_db(error):
     # if global object has a sqlite database then close it.
     # If u leave it open no one can access it and gets lost in memory causing leaks.
 
+    print("3. Inside close_db")
     if hasattr(g, "sqlite_db"):
         g.sqlite3_db.close()
 
@@ -42,11 +39,14 @@ def create_db_table():
 
     try:
         conn = connect_db()
+        #conn = get_db()
         cur = conn.cursor()
-        sql_query = "CREATE TABLE persons"
-        "( person_id INTEGER PRIMARY KEY NOT NULL,"
-        "name TEXT NOT NULL,"
-        "age INTEGER NOT NULL;)"
+        sql_query = '''
+        CREATE TABLE IF NOT EXISTS persons
+        ( person_id INTEGER PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        age INTEGER NOT NULL)
+        '''
         cur.execute(sql_query)
         conn.commit()
         print("Person table created successfully")
@@ -60,6 +60,7 @@ def create_db_table():
 
 def insert_person(person):
     # defines a function that adds a new user into the database
+    print("***Inside insert_person:",person)
 
     inserted_person = {}
     try:
@@ -79,8 +80,8 @@ def insert_person(person):
 
     return inserted_person
 
-
 def get_persons():
+    print("DB: inside get_persons persons ")
     persons = []
     try:
         conn = connect_db()
@@ -96,6 +97,7 @@ def get_persons():
             person["name"] = i["name"]
             person["age"] = i["age"]
             persons.append(person)
+            print("persons:", persons)
 
     except:
         persons = []
@@ -124,84 +126,40 @@ def get_person_by_id(person_id):
     return person
 
 
-def update_person(person):
-    # implements the feature to retrieve user(s) from the database.
+class Index(Resource):
 
-    updated_person = {}
-    try:
-        conn = connect_db()
-        cur = conn.cursor()
-        cur.execute(
-            "UPDATE persons SET name = ?, age = ? WHERE person_id =?",
-            (person["name"], person["age"]),
-        )
-        conn.commit()
-        # return the user
-        updated_person = get_person_by_id(person["person_id"])
-
-    except:
-        conn.rollback()
-        updated_person = {}
-    finally:
-        conn.close()
-
-    return updated_person
-
-
-def delete_person(person_id):
-    # implements the delete user feature
-
-    message = {}
-    try:
-        conn = connect_db()
-        conn.execute("DELETE from users WHERE user_id = ?", (person_id,))
-        conn.commit()
-        message["status"] = "User deleted successfully"
-    except:
-        conn.rollback()
-        message["status"] = "Cannot delete user"
-    finally:
-        conn.close()
-
-    return message
-
-
-# making a class for a particular resource
-# the get, post methods correspond to get and post requests
-# they are automatically mapped by flask_restful.
-# other methods include put, delete, etc.
-class Hello(Resource):
-
-    # corresponds to the GET request.
-    # this function is called whenever there
-    # is a GET request for this resource
     def get(self):
+        #return '<h1>Hello, World!</h1>'
 
-        return jsonify({"message": "hello world"})
-
-    # Corresponds to POST request
-    def post(self):
-
-        data = request.get_json()  # status code
-        return jsonify({"data": data}), 201
+        return Response('<h1>Hello, World!</h1>')
 
 
 # another resource to calculate the square of a number
-class Person(Resource):
+class Users(Resource):
 
     def get(self):
 
         # return {"Name": {self.name}, "Age": {self.age}}
 
-        user_details = {'name': 'GAN', 'age': 21}
+        #user_details = {'name': 'GAN', 'age': 21}
+        create_db_table()
+        person = Person("ganga", 15)
+
+        inserted_person = insert_person(person.__dict__)
+
+        persons_list = get_persons()
+
+        print("*** persons_list:", persons_list, len(persons_list))
 
         return Response(render_template('test.html',
-                        result_user=user_details, mimetype='text/html'))
-
+                                result_user=persons_list, mimetype='text/html'))  
 
 # adding the defined resources along with their corresponding urls
-# api.add_resource(Hello, '/')
-api.add_resource(Person, "/users")
+api.add_resource(Index, '/')
+api.add_resource(Users, "/users")
+#api.add_resource(Person, "/users")
+
+
 
 # driver function
 if __name__ == "__main__":

@@ -60,3 +60,9 @@ Questions:
 Assumed name and age are attributes of class
 
 It was difficult to understand whether name and age  are Class attributes or Instance Attributes
+
+
+Backend Implementation
+ we'll use Python Flask and SQLite for our backend. 
+
+ We create the Flask app and configure the app to allows access to our endpoints from any ip-address using CORS.

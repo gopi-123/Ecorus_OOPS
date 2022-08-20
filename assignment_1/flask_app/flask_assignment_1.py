@@ -37,10 +37,14 @@ class Office:
             del self.people_working[person_object.name]
 
     def __str__(self) -> str:
+        
         return (
-            f'Name:{self.name}, '
-            f'People working:{self.people_working}'
+            f'"name":"{self.name}", '
+            f'"people_working":{self.people_working}'
         )
+        
+        #return self.__dict__.__str__()
+
 
 
 # 4: Create 2 objects of that class (Eduardo and <dev_name>)
@@ -60,10 +64,10 @@ ecorus.finished_working_for(eduardo)
 # console screenshot showing the result (printing the objects)
 print("Person Object-->", eduardo)
 print("Person Object-->", ganga)
-print("Office Object-->", ecorus)
+print("##Office Object-->", ecorus)
 
 ecorus.start_working_for(eduardo)
-print("Office Object-->", ecorus)
+print("##Office Object-->", ecorus)
 
 print("Person  dicc-->", ganga.__dict__)
 print("Person  dicc-->", type(ganga.__dict__))
@@ -71,14 +75,24 @@ print("Person  dicc-->", type(ganga.__dict__))
 new_person = ganga.__dict__
 print("new_person", new_person, type(new_person), new_person["name"], new_person["age"])
 
+
+new_office = ecorus.__dict__
+print("##Office dicc -->", ecorus.__dict__)
+print("new_office", new_office, type(new_office), new_office["name"], new_office["people_working"], type(new_office["people_working"]))
+
+
+
 """
 output:
 
 Person Object--> {'name': 'eduardo', 'age': 0}
 Person Object--> {'name': 'ganga', 'age': 15}
-Office Object--> Name:ecorus, People working:{'ganga': 15}
-Office Object--> Name:ecorus, People working:{'ganga': 15, 'eduardo': 0}
+##Office Object--> "name":"ecorus", "people_working":{'ganga': 15}
+##Office Object--> "name":"ecorus", "people_working":{'ganga': 15, 'eduardo': 0}
 Person  dicc--> {'name': 'ganga', 'age': 15}
 Person  dicc--> <class 'dict'>
 new_person {'name': 'ganga', 'age': 15} <class 'dict'> ganga 15
+##Office dicc --> {'name': 'ecorus', 'people_working': {'ganga': 15, 'eduardo': 0}}
+new_office {'name': 'ecorus', 'people_working': {'ganga': 15, 'eduardo': 0}} <class 'dict'> ecorus {'ganga': 15, 'eduardo': 0} <class 'dict'>
+
 """

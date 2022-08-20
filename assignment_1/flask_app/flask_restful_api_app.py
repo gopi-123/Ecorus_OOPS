@@ -5,7 +5,9 @@ from flask import Flask, Response, g, jsonify, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 from flask_restful import Api, Resource
-from flask_assignment_1 import Person
+from flask_assignment_1 import Person, Office
+from persons_table import create_persons_db_table, insert_person, get_persons, get_person_by_id
+from office_table import create_office_db_table, insert_office, get_office_data, get_office_by_id
 
 # creating the flask app
 app = Flask(__name__)
@@ -14,14 +16,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 # creating an API object
 api = Api(app)
-
-def connect_db():
-    
-    print("1. Inside connect_db")
-    conn = sqlite3.connect('database.db')
-    return conn
-
-
 
 # close the connection to the database automatically
 @app.teardown_appcontext
@@ -33,99 +27,6 @@ def close_db(error):
     if hasattr(g, "sqlite_db"):
         g.sqlite3_db.close()
 
-
-def create_db_table():
-    # implements the person database
-
-    try:
-        conn = connect_db()
-        #conn = get_db()
-        cur = conn.cursor()
-        sql_query = '''
-        CREATE TABLE IF NOT EXISTS persons
-        ( person_id INTEGER PRIMARY KEY NOT NULL,
-        name TEXT NOT NULL,
-        age INTEGER NOT NULL)
-        '''
-        cur.execute(sql_query)
-        conn.commit()
-        print("Person table created successfully")
-
-    except:
-        print("Person table creation failed")
-
-    finally:
-        conn.close()
-
-
-def insert_person(person):
-    # defines a function that adds a new user into the database
-    print("***Inside insert_person:",person)
-
-    inserted_person = {}
-    try:
-        conn = connect_db()
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO persons (name, age) VALUES (?, ?)",
-            (person["name"], person["age"]),
-        )
-        conn.commit()
-        inserted_person = get_person_by_id(cur.lastrowid)
-    except:
-        conn().rollback()
-
-    finally:
-        conn.close()
-
-    return inserted_person
-
-def get_persons():
-    print("DB: inside get_persons persons ")
-    persons = []
-    try:
-        conn = connect_db()
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM persons")
-        rows = cur.fetchall()
-
-        # convert row objects to dictionary
-        for i in rows:
-            person = {}
-            person["person_id"] = i["person_id"]
-            person["name"] = i["name"]
-            person["age"] = i["age"]
-            persons.append(person)
-            print("persons:", persons)
-
-    except:
-        persons = []
-
-    return persons
-
-
-def get_person_by_id(person_id):
-    # implements the feature to retrieve user(s) from the database.
-
-    person = {}
-    try:
-        conn = connect_db()
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM persons WHERE person_id = ?", (person_id,))
-        row = cur.fetchone()
-
-        # convert row object to dictionary
-        person["person_id"] = row["person_id"]
-        person["name"] = row["name"]
-        person["age"] = row["age"]
-    except:
-        person = {}
-
-    return person
-
-
 class Index(Resource):
 
     def get(self):
@@ -134,33 +35,71 @@ class Index(Resource):
         return Response('<h1>Hello, World!</h1>')
 
 
-# another resource to calculate the square of a number
+# another resource to dispaly the Persons inforamtion
 class Users(Resource):
 
     def get(self):
 
         # return {"Name": {self.name}, "Age": {self.age}}
 
-        #user_details = {'name': 'GAN', 'age': 21}
-        create_db_table()
+        # user_details = {'name': 'GAN', 'age': 21}
+        
         person = Person("ganga", 15)
-
+        
+        create_persons_db_table()
         inserted_person = insert_person(person.__dict__)
 
         persons_list = get_persons()
 
         print("*** persons_list:", persons_list, len(persons_list))
 
-        return Response(render_template('test.html',
+        return Response(render_template('person.html',
                                 result_user=persons_list, mimetype='text/html'))  
+
+
+class OfficeData(Resource):
+    
+    def get(self):
+        
+        # return {Name:ecorus, People working:{'ganga': 15, 'eduardo': 0} }
+
+        # return {'name': 'ecorus', 'people_working': {'ganga': 15, 'eduardo': 0}}
+
+        
+        eduardo = Person("eduardo")
+        ganga = Person("ganga", 15)
+
+        office_obj = Office("ecorus")
+
+        print("*** INitatiing **",office_obj.__dict__)
+
+        office_obj.start_working_for(eduardo)
+        office_obj.start_working_for(ganga)
+        
+        office_obj.finished_working_for(eduardo)
+        # office_obj.finished_working_for(ganga)
+
+        create_office_db_table()
+        inserted_office = insert_office(office_obj.__dict__)
+
+        office_data_list = get_office_data()
+
+        print("*** office_data_list:", office_data_list, len(office_data_list))
+
+        return Response(render_template('office.html',
+                                result_office=office_data_list, mimetype='text/html')) 
+
+
 
 # adding the defined resources along with their corresponding urls
 api.add_resource(Index, '/')
 api.add_resource(Users, "/users")
-#api.add_resource(Person, "/users")
+api.add_resource(OfficeData, "/office")
+
+# api.add_resource(Person, "/users")
 
 
 
 # driver function
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

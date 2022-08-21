@@ -6,7 +6,7 @@ from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_assignment_1 import Person, Office
-from persons_table import create_persons_db_table, insert_person, get_persons, get_person_by_id
+from persons_table import create_persons_db_table, insert_person, get_persons, get_person_by_id, update_person_name, update_birthday_age
 from office_table import create_office_db_table, insert_office, get_office_data, get_office_by_id
 
 # creating the flask app
@@ -16,6 +16,12 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 # creating an API object
 api = Api(app)
+
+"""
+task_post_args = reqparse.RequestParser()
+task_post_args.add_argument("name", type=str, help="name is required", required=True)
+task_post_args.add_argument("age", type=int, help="age is required", required=True)
+"""
 
 # close the connection to the database automatically
 @app.teardown_appcontext
@@ -35,16 +41,41 @@ class Index(Resource):
         return Response('<h1>Hello, World!</h1>')
 
 
-# another resource to dispaly the Persons inforamtion
 class Users(Resource):
 
+    def __init__(self) -> None:
+        print(" ### inside init__ of USERs")
+        create_persons_db_table()
+
     def get(self):
+        # retrieves all person records
+
+        print("### INSIDE NEW GET ###")
+        persons_list = get_persons()
+
+        return Response(render_template('person.html',
+                        result_user=persons_list, mimetype='text/html'))
+
+    def post(self):
+        # create / add person to the person table
+
+        # args = task_post_args.parse_args()
+        # todos[todo_id] = request.form['data']
+        person_dict = request.get_json()
+        
+        #return jsonify(insert_person(person))
+        return Response(render_template('createdperson.html', 
+                                result_dict=insert_person(person_dict), mimetype='text/html'))
+
+
+    
+    def get_old(self):
 
         # return {"Name": {self.name}, "Age": {self.age}}
 
         # user_details = {'name': 'GAN', 'age': 21}
-        
-        person = Person("ganga", 15)
+
+        person = Person("GAN", 15)
         
         create_persons_db_table()
         inserted_person = insert_person(person.__dict__)
@@ -55,7 +86,34 @@ class Users(Resource):
 
         return Response(render_template('person.html',
                                 result_user=persons_list, mimetype='text/html'))  
+                                
 
+class ChangeUserName(Users, Resource):
+
+    def __init__(self) -> None:
+        print("##inside super__init")
+        super().__init__()
+    
+    def put(self):
+        person_dict = request.get_json()
+        
+        #return jsonify(insert_person(person))
+        return Response(render_template('changename.html', 
+                                result_dict=update_person_name(person_dict), mimetype='text/html'))
+
+
+class HappyBirthday(Users, Resource):
+
+    def __init__(self) -> None:
+        print("##inside super__init")
+        super().__init__()
+    
+    def put(self):
+        person_dict = request.get_json()
+        
+        #return jsonify(insert_person(person))
+        return Response(render_template('birthday.html', 
+                                result_dict=update_birthday_age(person_dict), mimetype='text/html'))
 
 class OfficeData(Resource):
     
@@ -93,8 +151,10 @@ class OfficeData(Resource):
 
 # adding the defined resources along with their corresponding urls
 api.add_resource(Index, '/')
-api.add_resource(Users, "/users")
-api.add_resource(OfficeData, "/office")
+api.add_resource(Users, "/api/users")
+api.add_resource(ChangeUserName, "/api/users/change-person-name")
+api.add_resource(HappyBirthday, "/api/users/happy-birthday")
+api.add_resource(OfficeData, "/api/office")
 
 # api.add_resource(Person, "/users")
 

@@ -34,7 +34,7 @@ def create_persons_db_table():
         conn.close()
 
 
-def insert_person(person):
+def insert_person(person: dict) -> dict:
     # defines a function that adds a new user into the database
     print("***Inside insert_person:", person)
 
@@ -93,11 +93,55 @@ def get_person_by_id(person_id):
         cur.execute("SELECT * FROM persons WHERE person_id = ?", (person_id,))
         row = cur.fetchone()
 
-        # convert row object to dictionary
-        person["person_id"] = row["person_id"]
-        person["name"] = row["name"]
-        person["age"] = row["age"]
+        if row:
+            # convert row object to dictionary
+            person["person_id"] = row["person_id"]
+            person["name"] = row["name"]
+            person["age"] = row["age"]
+
     except sqlite3.DatabaseError:
         person = {}
 
     return person
+
+
+def update_person_name(person: dict):
+    updated_person = {}
+    try:
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("UPDATE persons SET name = ? WHERE person_id =?",
+                    (person["name"], person["person_id"],))
+        conn.commit()
+        # return the user
+        updated_person = get_person_by_id(person["person_id"])
+
+    except sqlite3.DatabaseError:
+        conn.rollback()
+        updated_person = {}
+
+    finally:
+        conn.close()
+
+    return updated_person
+
+
+def update_birthday_age(person: dict):
+    updated_person = {}
+    try:
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("UPDATE persons SET age = ? WHERE person_id =?",
+                    (person["age"]+1, person["person_id"],))
+        conn.commit()
+        # return the user
+        updated_person = get_person_by_id(person["person_id"])
+
+    except sqlite3.DatabaseError:
+        conn.rollback()
+        updated_person = {}
+
+    finally:
+        conn.close()
+
+    return updated_person

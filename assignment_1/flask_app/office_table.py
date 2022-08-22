@@ -17,6 +17,7 @@ def create_office_db_table():
         conn = connect_db()
         # conn = get_db()
         cur = conn.cursor()
+
         sql_query = '''
             CREATE TABLE IF NOT EXISTS office
             (employee_id INTEGER PRIMARY KEY NOT NULL,
@@ -24,6 +25,17 @@ def create_office_db_table():
             employee_name TEXT NOT NULL,
             employee_age INTEGER NOT NULL)
             '''
+        """
+        sql_query = '''
+            CREATE TABLE IF NOT EXISTS office
+            (employee_id INTEGER NOT NULL,
+            office_name TEXT NOT NULL,
+            employee_name TEXT NOT NULL,
+            employee_age INTEGER NOT NULL,
+            PRIMARY KEY (employee_id, office_name))
+            '''
+        """
+        
         cur.execute(sql_query)
         conn.commit()
         print("office table created successfully")
@@ -35,7 +47,7 @@ def create_office_db_table():
         conn.close()
 
 
-def insert_office(office: Office) -> dict:
+def insert_office(office: dict) -> dict:
     # defines a function that adds a new office data into the database
     print("***Inside insert_office:", office)
 
@@ -43,15 +55,16 @@ def insert_office(office: Office) -> dict:
     try:
         conn = connect_db()
         cur = conn.cursor()
-        
-        for emp_name, emp_age in office["people_working"].items():
-            cur.execute(
-                "INSERT INTO office (office_name, employee_name, employee_age) VALUES (?, ?, ?)",
-                (office["name"], emp_name, emp_age)
-            )
+        if office:
+            for emp_name, emp_age in office["people_working"].items():
+                cur.execute(
+                    "INSERT INTO office (office_name, employee_name, employee_age) VALUES (?, ?, ?)",
+                    (office["name"], emp_name, emp_age)
+                )
 
-        conn.commit()
-        inserted_office = get_office_by_id(cur.lastrowid)
+            conn.commit()
+            inserted_office = get_office_by_id(cur.lastrowid)
+        
     except sqlite3.DatabaseError:
         conn().rollback()
 
@@ -88,7 +101,7 @@ def get_office_data() -> list:
     return office_data
 
 
-def get_office_by_id(employee_id : int) -> dict:
+def get_office_by_id(employee_id: int) -> dict:
     # implements the feature to retrieve user(s) from the database.
 
     office_data = {}
@@ -112,3 +125,22 @@ def get_office_by_id(employee_id : int) -> dict:
         office_data = {}
 
     return office_data
+
+def delete_employee_by_id(employee_id: int) -> dict:
+
+    message = {}
+    try:
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("DELETE from office WHERE employee_id = ?", (employee_id,))
+        conn.commit()
+        message["status"] = "Employee deleted successfully"
+                
+    except sqlite3.DatabaseError:
+        conn.rollback()
+        message["status"] = "Cannot delete employee" 
+    finally:
+        conn.close()
+
+    return message
+    

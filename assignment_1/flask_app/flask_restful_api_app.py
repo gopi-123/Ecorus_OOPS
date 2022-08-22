@@ -8,6 +8,7 @@ from flask_restful import Api, Resource
 from flask_assignment_1 import Person, Office
 from persons_table import create_persons_db_table, insert_person, get_persons, get_person_by_id, update_person_name, update_birthday_age
 from office_table import create_office_db_table, insert_office, get_office_data, get_office_by_id
+from office_api_resource import OfficeData, OfficeStartWorkingFor, OfficeFinishedWorkingFor
 
 # creating the flask app
 app = Flask(__name__)
@@ -115,6 +116,7 @@ class HappyBirthday(Users, Resource):
         return Response(render_template('birthday.html', 
                                 result_dict=update_birthday_age(person_dict), mimetype='text/html'))
 
+"""
 class OfficeData(Resource):
     
     def get(self):
@@ -126,19 +128,23 @@ class OfficeData(Resource):
         
         eduardo = Person("eduardo")
         ganga = Person("ganga", 15)
+        
 
         office_obj = Office("ecorus")
-
-        print("*** INitatiing **",office_obj.__dict__)
+        
+        print("*** INitatiing **", office_obj.__dict__)
 
         office_obj.start_working_for(eduardo)
         office_obj.start_working_for(ganga)
-        
+
         office_obj.finished_working_for(eduardo)
-        # office_obj.finished_working_for(ganga)
+        office_obj.finished_working_for(ganga)
+        print("### office_obj.__dict_", office_obj.__dict__)
+        
 
         create_office_db_table()
         inserted_office = insert_office(office_obj.__dict__)
+       
 
         office_data_list = get_office_data()
 
@@ -147,14 +153,20 @@ class OfficeData(Resource):
         return Response(render_template('office.html',
                                 result_office=office_data_list, mimetype='text/html')) 
 
-
+"""
 
 # adding the defined resources along with their corresponding urls
+"""
 api.add_resource(Index, '/')
 api.add_resource(Users, "/api/users")
 api.add_resource(ChangeUserName, "/api/users/change-person-name")
 api.add_resource(HappyBirthday, "/api/users/happy-birthday")
+"""
+
 api.add_resource(OfficeData, "/api/office")
+api.add_resource(OfficeStartWorkingFor, "/api/office/add/start-working-for")
+
+api.add_resource(OfficeFinishedWorkingFor, "/api/office/remove/finished_working_for/<int:employee_id>")
 
 # api.add_resource(Person, "/users")
 

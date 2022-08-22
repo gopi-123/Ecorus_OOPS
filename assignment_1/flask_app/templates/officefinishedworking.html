@@ -15,7 +15,7 @@
     </head>
     <body>
         
-        <h1>Welcome to the Site!</h1>        
+        <h1>Successfully removed employee by Id in office Data!</h1>        
         <table border="1">
             <caption><b>Office Data </b></caption>
             <thead>
@@ -29,14 +29,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for office_data in result_office %}
+                
                   <tr>
-                    <td>{{ office_data["employee_id"] }}</td>
-                    <td>{{ office_data["office_name"] }}</td>
-                    <td>{{ office_data["employee_name"] }}</td>
-                    <td>{{ office_data["employee_age"] }}</td>
+                    <td>{{ result_office["employee_id"] }}</td>
+                    <td>{{ result_office["office_name"] }}</td>
+                    <td>{{ result_office["employee_name"] }}</td>
+                    <td>{{ result_office["employee_age"] }}</td>
                   </tr>
-                {% endfor %}
+                
               </tbody>
 
         </table>
